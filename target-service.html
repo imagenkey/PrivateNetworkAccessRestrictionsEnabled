@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ローカルテストサービス - ターゲットページ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+        }
+
+        .info {
+            background: rgba(33, 150, 243, 0.3);
+            border-color: #2196f3;
+        }
+
+        .warning {
+            background: rgba(255, 193, 7, 0.3);
+            border-color: #ffc107;
+        }
+
+        .server-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .timestamp {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎯 ローカルネットワークテストサービス</h1>
+
+        <div class="status-card success">
+            <h2>✅ サービス稼働中</h2>
+            <p>このページが表示されている場合、ローカルHTTPサーバーが正常に稼働しており、Microsoft Edgeのローカルネットワークアクセス制限ポリシーが無効になっているか、アクセスが許可されています。</p>
+        </div>
+
+        <div class="status-card info">
+            <h2>📋 テスト目的</h2>
+            <p>このサービスは、<code>LocalNetworkAccessRestrictionsEnabled</code>ポリシーの動作検証を目的として設計されています。</p>
+            <ul>
+                <li><strong>ポリシー有効時：</strong> このページへのアクセスがブロックされる</li>
+                <li><strong>ポリシー無効時：</strong> このページが正常に表示される</li>
+            </ul>
+        </div>
+
+        <div class="status-card warning">
+            <h2>⚠️ セキュリティ注意事項</h2>
+            <p>このサーバーは<strong>テスト専用</strong>です。本番環境での使用は推奨されません。テスト完了後は必ずサーバーを停止してください。</p>
+        </div>
+
+        <div class="server-info">
+            <div class="info-item">
+                <h3>🌐 サーバー情報</h3>
+                <p><strong>名前:</strong> Local Test Server</p>
+                <p><strong>バージョン:</strong> 1.0.0</p>
+                <p><strong>ポート:</strong> <span id="serverPort">8080</span></p>
+            </div>
+
+            <div class="info-item">
+                <h3>🔍 クライアント情報</h3>
+                <p><strong>IP:</strong> <span id="clientIP">取得中...</span></p>
+                <p><strong>User-Agent:</strong> <span id="userAgent">取得中...</span></p>
+                <p><strong>言語:</strong> <span id="language">取得中...</span></p>
+            </div>
+
+            <div class="info-item">
+                <h3>📊 アクセス統計</h3>
+                <p><strong>アクセス時刻:</strong> <span id="accessTime">取得中...</span></p>
+                <p><strong>セッションID:</strong> <span id="sessionId">取得中...</span></p>
+                <p><strong>リファラー:</strong> <span id="referrer">取得中...</span></p>
+            </div>
+
+            <div class="info-item">
+                <h3>🛠️ テスト推奨事項</h3>
+                <p><strong>1.</strong> DevToolsでネットワークタブを確認</p>
+                <p><strong>2.</strong> コンソールでエラー/警告を確認</p>
+                <p><strong>3.</strong> 複数のポートでテスト実行</p>
+            </div>
+        </div>
+
+        <div class="timestamp">
+            最終更新: <span id="lastUpdate"></span>
+        </div>
+    </div>
+
+    <script>
+        // ページ情報の動的更新
+        document.addEventListener('DOMContentLoaded', function () {
+            updatePageInfo();
+            setInterval(updatePageInfo, 5000); // 5秒ごとに更新
+        });
+
+        function updatePageInfo() {
+            // 現在時刻の更新
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleString('ja-JP');
+            document.getElementById('accessTime').textContent = now.toLocaleString('ja-JP');
+
+            // クライアント情報の更新
+            document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 50) + '...';
+            document.getElementById('language').textContent = navigator.language;
+
+            // セッションIDの生成（簡易版）
+            if (!sessionStorage.getItem('sessionId')) {
+                sessionStorage.setItem('sessionId', generateSessionId());
+            }
+            document.getElementById('sessionId').textContent = sessionStorage.getItem('sessionId');
+
+            // リファラーの取得
+            document.getElementById('referrer').textContent = document.referrer || 'なし';
+
+            // ポート番号の推測
+            const port = window.location.port || '80';
+            document.getElementById('serverPort').textContent = port;
+
+            // クライアントIPの取得を試行
+            fetchClientIP();
+        }
+
+        function generateSessionId() {
+            return 'sess_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function fetchClientIP() {
+            try {
+                // 簡易的なIP取得（サーバーからの応答が必要）
+                const response = await fetch('/api/clientinfo', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('clientIP').textContent = data.client_ip || 'localhost';
+                } else {
+                    document.getElementById('clientIP').textContent = 'localhost';
+                }
+            } catch (error) {
+                document.getElementById('clientIP').textContent = 'localhost';
+            }
+        }
+
+        // ページの可視性変更を監視
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                updatePageInfo();
+            }
+        });
+    </script>
+</body>
+
+</html>

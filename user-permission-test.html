@@ -238,7 +238,7 @@
             <p>具体的には以下へのアクセスを要求しています：</p>
             <div id="requestedUrls" class="code-block"></div>
             <p>⚠️ <strong>セキュリティリスク</strong>: ローカルネットワークデバイス（ルーター、プリンター等）への不正アクセスの可能性があります。</p>
-            
+
             <div class="modal-buttons">
                 <button class="modal-button allow-button" onclick="handleUserPermission(true)">
                     ✅ 許可する
@@ -255,29 +255,30 @@
 
         <div class="test-section">
             <h2>📋 テスト概要</h2>
-            <p>このページは、Microsoft EdgeのLocalNetworkAccessRestrictionsEnabledポリシーの<strong>「ユーザーが明示的に許可しない限り」</strong>機能をテストします。</p>
+            <p>このページは、Microsoft
+                EdgeのLocalNetworkAccessRestrictionsEnabledポリシーの<strong>「ユーザーが明示的に許可しない限り」</strong>機能をテストします。</p>
             <p>ポリシーが有効な場合、ローカルネットワークアクセス前に明示的なユーザー許可が必要になります。</p>
         </div>
 
         <div class="test-section">
             <h2>🔐 ユーザー許可フロー実演</h2>
             <p>以下のステップでユーザー許可プロセスを体験できます：</p>
-            
+
             <div class="step-indicator">
                 <div class="step-number" id="step1">1</div>
                 <span>許可要求の開始</span>
             </div>
-            
+
             <div class="step-indicator">
                 <div class="step-number" id="step2">2</div>
                 <span>ブラウザ許可プロンプトまたはカスタムダイアログ</span>
             </div>
-            
+
             <div class="step-indicator">
                 <div class="step-number" id="step3">3</div>
                 <span>ユーザーの明示的な選択</span>
             </div>
-            
+
             <div class="step-indicator">
                 <div class="step-number" id="step4">4</div>
                 <span>許可状態に基づくアクセス実行</span>
@@ -286,11 +287,11 @@
             <button class="permission-button" onclick="requestNetworkPermission()">
                 🔓 ローカルネットワークアクセス許可を要求
             </button>
-            
+
             <button class="test-button" onclick="testWithCurrentPermission()" id="testWithPermissionBtn" disabled>
                 🧪 現在の許可状態でテスト実行
             </button>
-            
+
             <button class="test-button" onclick="resetPermissions()">
                 🔄 許可状態をリセット
             </button>
@@ -299,19 +300,19 @@
         <div class="test-section">
             <h2>🎯 段階的アクセステスト</h2>
             <p>許可レベルに応じた段階的アクセステストを実行します：</p>
-            
+
             <button class="test-button" onclick="testLevel1_NoPermission()">
                 レベル1: 許可なしアクセス（ブロック確認）
             </button>
-            
+
             <button class="test-button" onclick="testLevel2_RequestPermission()">
                 レベル2: 許可要求付きアクセス
             </button>
-            
+
             <button class="test-button" onclick="testLevel3_PermissionGranted()">
                 レベル3: 許可済み状態でのアクセス
             </button>
-            
+
             <button class="test-button" onclick="testLevel4_MultipleTargets()">
                 レベル4: 複数ターゲットでの許可管理
             </button>
@@ -320,15 +321,15 @@
         <div class="test-section">
             <h2>🔍 Permissions API詳細テスト</h2>
             <p>ブラウザのPermissions APIを使用した詳細な許可状態確認：</p>
-            
+
             <button class="test-button" onclick="checkPermissionsAPISupport()">
                 Permissions API対応確認
             </button>
-            
+
             <button class="test-button" onclick="queryCurrentPermissions()">
                 現在の許可状態クエリ
             </button>
-            
+
             <button class="test-button" onclick="testPermissionPersistence()">
                 許可の永続性テスト
             </button>
@@ -379,7 +380,7 @@
                 // Permissions APIの対応確認
                 if ('permissions' in navigator) {
                     console.log('[PermissionTest] Permissions API対応確認...');
-                    
+
                     // 一般的なPermissions APIクエリ
                     const result = await navigator.permissions.query({ name: 'camera' });
                     console.log('[PermissionTest] サンプル許可状態:', result.state);
@@ -393,7 +394,7 @@
                         permission.granted ? '許可済み' : '拒否済み',
                         permission.granted ? 'granted' : 'denied'
                     );
-                    
+
                     if (permission.granted) {
                         document.getElementById('testWithPermissionBtn').disabled = false;
                     }

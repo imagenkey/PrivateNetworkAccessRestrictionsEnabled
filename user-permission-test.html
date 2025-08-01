@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー許可テスト - LocalNetworkAccessRestrictionsEnabled</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0078d4;
+            border-bottom: 3px solid #0078d4;
+            padding-bottom: 10px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .permission-button {
+            background-color: #d83b01;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .permission-button:hover {
+            background-color: #c4311d;
+        }
+
+        .permission-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .test-button {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .test-button:hover {
+            background-color: #106ebe;
+        }
+
+        .test-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .permission-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .permission-granted {
+            background-color: #28a745;
+        }
+
+        .permission-denied {
+            background-color: #dc3545;
+        }
+
+        .permission-prompt {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .permission-unknown {
+            background-color: #6c757d;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .step-number {
+            background-color: #0078d4;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .step-completed {
+            background-color: #28a745;
+        }
+
+        .permission-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: #d83b01;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .allow-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .deny-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="permissionStatus" class="permission-status permission-unknown">
+        許可状態: 確認中...
+    </div>
+
+    <!-- カスタム許可モーダル -->
+    <div id="permissionModal" class="permission-modal">
+        <div class="modal-content">
+            <h3>🔒 ローカルネットワークアクセス許可要求</h3>
+            <p><strong>このサイトがプライベートネットワークリソースにアクセスしようとしています。</strong></p>
+            <p>具体的には以下へのアクセスを要求しています：</p>
+            <div id="requestedUrls" class="code-block"></div>
+            <p>⚠️ <strong>セキュリティリスク</strong>: ローカルネットワークデバイス（ルーター、プリンター等）への不正アクセスの可能性があります。</p>
+            
+            <div class="modal-buttons">
+                <button class="modal-button allow-button" onclick="handleUserPermission(true)">
+                    ✅ 許可する
+                </button>
+                <button class="modal-button deny-button" onclick="handleUserPermission(false)">
+                    ❌ 拒否する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🔐 ユーザー明示許可テスト - LocalNetworkAccessRestrictionsEnabled</h1>
+
+        <div class="test-section">
+            <h2>📋 テスト概要</h2>
+            <p>このページは、Microsoft EdgeのLocalNetworkAccessRestrictionsEnabledポリシーの<strong>「ユーザーが明示的に許可しない限り」</strong>機能をテストします。</p>
+            <p>ポリシーが有効な場合、ローカルネットワークアクセス前に明示的なユーザー許可が必要になります。</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🔐 ユーザー許可フロー実演</h2>
+            <p>以下のステップでユーザー許可プロセスを体験できます：</p>
+            
+            <div class="step-indicator">
+                <div class="step-number" id="step1">1</div>
+                <span>許可要求の開始</span>
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step-number" id="step2">2</div>
+                <span>ブラウザ許可プロンプトまたはカスタムダイアログ</span>
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step-number" id="step3">3</div>
+                <span>ユーザーの明示的な選択</span>
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step-number" id="step4">4</div>
+                <span>許可状態に基づくアクセス実行</span>
+            </div>
+
+            <button class="permission-button" onclick="requestNetworkPermission()">
+                🔓 ローカルネットワークアクセス許可を要求
+            </button>
+            
+            <button class="test-button" onclick="testWithCurrentPermission()" id="testWithPermissionBtn" disabled>
+                🧪 現在の許可状態でテスト実行
+            </button>
+            
+            <button class="test-button" onclick="resetPermissions()">
+                🔄 許可状態をリセット
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 段階的アクセステスト</h2>
+            <p>許可レベルに応じた段階的アクセステストを実行します：</p>
+            
+            <button class="test-button" onclick="testLevel1_NoPermission()">
+                レベル1: 許可なしアクセス（ブロック確認）
+            </button>
+            
+            <button class="test-button" onclick="testLevel2_RequestPermission()">
+                レベル2: 許可要求付きアクセス
+            </button>
+            
+            <button class="test-button" onclick="testLevel3_PermissionGranted()">
+                レベル3: 許可済み状態でのアクセス
+            </button>
+            
+            <button class="test-button" onclick="testLevel4_MultipleTargets()">
+                レベル4: 複数ターゲットでの許可管理
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Permissions API詳細テスト</h2>
+            <p>ブラウザのPermissions APIを使用した詳細な許可状態確認：</p>
+            
+            <button class="test-button" onclick="checkPermissionsAPISupport()">
+                Permissions API対応確認
+            </button>
+            
+            <button class="test-button" onclick="queryCurrentPermissions()">
+                現在の許可状態クエリ
+            </button>
+            
+            <button class="test-button" onclick="testPermissionPersistence()">
+                許可の永続性テスト
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 テスト結果</h2>
+            <div id="testResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🛠️ 実装詳細</h2>
+            <div class="info">
+                <strong>ポリシー有効時の期待動作：</strong><br>
+                1. <strong>自動ブロック</strong>: 許可なしの要求は即座にブロック<br>
+                2. <strong>許可プロンプト</strong>: ユーザージェスチャ後に許可ダイアログ表示<br>
+                3. <strong>明示的選択</strong>: ユーザーが「許可」または「拒否」を明示的に選択<br>
+                4. <strong>状態管理</strong>: 許可状態がセッション（またはサイト設定）で保持<br>
+                5. <strong>細かい制御</strong>: URL/ポート別の詳細な許可管理<br><br>
+
+                <strong>技術実装ポイント：</strong><br>
+                • <code>navigator.permissions.query()</code> for permission status<br>
+                • <code>fetch()</code> with proper error handling<br>
+                • User gesture requirements for permission requests<br>
+                • Custom permission UI for fallback scenarios<br>
+                • Persistent permission storage mechanisms
+            </div>
+        </div>
+    </div>
+
+    <script src="user-permission-test.js"></script>
+    <script>
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function () {
+            initializePermissionTest();
+            checkInitialPermissionState();
+        });
+
+        // 初期化
+        function initializePermissionTest() {
+            console.log('[PermissionTest] ユーザー許可テストを初期化中...');
+            updatePermissionStatus('確認中...', 'unknown');
+        }
+
+        // 初期許可状態の確認
+        async function checkInitialPermissionState() {
+            try {
+                // Permissions APIの対応確認
+                if ('permissions' in navigator) {
+                    console.log('[PermissionTest] Permissions API対応確認...');
+                    
+                    // 一般的なPermissions APIクエリ
+                    const result = await navigator.permissions.query({ name: 'camera' });
+                    console.log('[PermissionTest] サンプル許可状態:', result.state);
+                }
+
+                // カスタム許可状態の確認
+                const storedPermission = localStorage.getItem('localNetworkPermission');
+                if (storedPermission) {
+                    const permission = JSON.parse(storedPermission);
+                    updatePermissionStatus(
+                        permission.granted ? '許可済み' : '拒否済み',
+                        permission.granted ? 'granted' : 'denied'
+                    );
+                    
+                    if (permission.granted) {
+                        document.getElementById('testWithPermissionBtn').disabled = false;
+                    }
+                } else {
+                    updatePermissionStatus('未設定', 'unknown');
+                }
+
+            } catch (error) {
+                console.error('[PermissionTest] 初期状態確認エラー:', error);
+                updatePermissionStatus('エラー', 'unknown');
+            }
+        }
+
+        // 許可状態の表示更新
+        function updatePermissionStatus(message, state) {
+            const statusDiv = document.getElementById('permissionStatus');
+            statusDiv.textContent = `許可状態: ${message}`;
+            statusDiv.className = `permission-status permission-${state}`;
+        }
+
+        // 結果表示
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

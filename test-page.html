@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LocalNetworkAccessRestrictionsEnabled テストページ</title>
+    <title>Microsoft Edge v138+ ローカルネットワークアクセス制御テスト</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -23,228 +23,183 @@
 
         h1 {
             color: #0078d4;
-            border-bottom: 3px solid #0078d4;
+            border-bottom: 2px solid #0078d4;
             padding-bottom: 10px;
         }
 
-        .test-section {
+        .info-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 6px;
             margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .test-section {
+            margin: 30px 0;
             padding: 20px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fafafa;
+            border-radius: 6px;
         }
 
-        button {
-            background-color: #0078d4;
+        .test-button {
+            background: #0078d4;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 4px;
             cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #106ebe;
+        .test-button:hover {
+            background: #106ebe;
         }
 
-        button:disabled {
-            background-color: #ccc;
+        .test-button:disabled {
+            background: #ccc;
             cursor: not-allowed;
         }
 
         .result {
-            margin-top: 10px;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 15px;
             border-radius: 4px;
-            font-family: monospace;
-            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
         }
 
-        .success {
-            background-color: #d4edda;
-            color: #155724;
+        .result.success {
+            background: #d4edda;
             border: 1px solid #c3e6cb;
+            color: #155724;
         }
 
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
+        .result.error {
+            background: #f8d7da;
             border: 1px solid #f5c6cb;
+            color: #721c24;
         }
 
-        .info {
-            background-color: #d1ecf1;
-            color: #0c5460;
+        .result.info {
+            background: #d1ecf1;
             border: 1px solid #bee5eb;
+            color: #0c5460;
         }
 
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .target-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .target-item {
-            padding: 8px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
-        .policy-status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px;
-            border-radius: 4px;
+        .flag-link {
+            display: inline-block;
+            background: #28a745;
             color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .flag-link:hover {
+            background: #218838;
+        }
+
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .settings-table th,
+        .settings-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .settings-table th {
+            background: #f8f9fa;
             font-weight: bold;
         }
 
-        .policy-enabled {
-            background-color: #d32f2f;
-        }
-
-        .policy-disabled {
-            background-color: #388e3c;
-        }
-
-        .policy-unknown {
-            background-color: #f57c00;
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
         }
     </style>
 </head>
 
 <body>
-    <div id="policyStatus" class="policy-status policy-unknown">
-        ポリシー状態: 確認中...
-    </div>
-
     <div class="container">
-        <h1>LocalNetworkAccessRestrictionsEnabled ポリシー検証テスト</h1>
-
-        <div class="test-section">
-            <h2>📋 テスト概要</h2>
-            <p>このページは、Microsoft Edgeの<code>LocalNetworkAccessRestrictionsEnabled</code>ポリシーの動作を検証するためのテストツールです。</p>
-            <p>各種ローカルネットワークアドレスにHTTP要求を送信し、ポリシーによるブロック動作を確認できます。</p>
+        <h1>Microsoft Edge v138+ ローカルネットワークアクセス制御テスト</h1>
+        <div class="info-section">
+            <h3>🔧 Edge設定について</h3>
+            <p>Microsoft Edge v138以降では、ローカルネットワークへのアクセス時にユーザーの明示的な許可が必要になりました。</p> <a
+                href="edge://flags/#local-network-access-check" class="flag-link" target="_blank"> Edge設定を開く
+                (edge://flags/#local-network-access-check) </a>
+            <table class="settings-table">
+                <tr>
+                    <th>設定値</th>
+                    <th>動作</th>
+                    <th>テスト推奨度</th>
+                </tr>
+                <tr>
+                    <td><code>Enabled</code></td>
+                    <td>ダイアログ表示（ユーザーが許可/ブロックを選択）</td>
+                    <td>⭐⭐⭐ 推奨</td>
+                </tr>
+                <tr>
+                    <td><code>Enabled (Blocking)</code></td>
+                    <td>完全ブロック（ダイアログなし）</td>
+                    <td>⭐⭐ ブロック動作確認</td>
+                </tr>
+                <tr>
+                    <td><code>Disabled</code></td>
+                    <td>従来動作（警告のみ）</td>
+                    <td>⭐ 参考確認</td>
+                </tr>
+            </table>
         </div>
-
+        <div class="info-section warning">
+            <h3>⚠️ テスト実行時の注意</h3>
+            <ul>
+                <li><strong>「Enabled」設定時</strong>：ダイアログが表示されるまで時間がかかる場合があります</li>
+                <li><strong>ダイアログ操作</strong>：「許可」または「ブロック」を選択してください</li>
+                <li><strong>応答時間</strong>：1秒以上の場合、ダイアログ操作が行われた可能性があります</li>
+                <li><strong>ブラウザ再起動</strong>：設定変更後は Edge を再起動してください</li>
+            </ul>
+        </div> <!-- テストセクション -->
         <div class="test-section">
-            <h2>🎯 個別アドレステスト</h2>
-            <p>特定のローカルIPアドレスへの要求をテストします：</p>
-            <div>
-                <input type="text" id="customTarget" placeholder="例: 192.168.1.1:8080"
-                    style="padding: 8px; width: 200px; margin-right: 10px;">
-                <button onclick="testSingleTarget()">個別テスト実行</button>
-            </div>
-            <div id="singleTestResult" class="result" style="display: none;"></div>
+            <h3>🌐 ルーターアクセステスト</h3>
+            <p>一般的な家庭用ルーター (192.168.1.1) への接続をテストします。</p> <button class="test-button"
+                onclick="testRouter()">ルーターテスト実行</button>
+            <div id="router-result"></div>
         </div>
-
         <div class="test-section">
-            <h2>🔍 一括スキャンテスト</h2>
-            <p>一般的なローカルネットワークアドレスに対して一括テストを実行します：</p>
-            <button onclick="runLocalNetworkScan()">ローカルネットワークスキャン開始</button>
-            <button onclick="runPrivateIPScan()">プライベートIP範囲スキャン</button>
-            <button onclick="runCommonServiceScan()">一般的なサービスポートスキャン</button>
-            <button onclick="clearResults()">結果クリア</button>
-            <div id="bulkTestResult" class="result" style="display: none;"></div>
+            <h3>🏠 ローカルホストテスト</h3>
+            <p>開発サーバー (127.0.0.1:8000) への接続をテストします。</p> <button class="test-button"
+                onclick="testLocalhost()">ローカルホストテスト実行</button>
+            <div id="localhost-result"></div>
         </div>
-
         <div class="test-section">
-            <h2>📊 テスト対象アドレス一覧</h2>
-            <p>以下のアドレスがテストの対象となります：</p>
-            <div class="target-list" id="targetList"></div>
-        </div>
-
+            <h3>🔒 プライベートネットワークテスト</h3>
+            <p>企業内ネットワーク (10.0.0.1) への接続をテストします。</p> <button class="test-button"
+                onclick="testPrivateNetwork()">プライベートネットワークテスト実行</button>
+            <div id="private-result"></div>
+        </div> <!-- ブラウザ情報表示 -->
         <div class="test-section">
-            <h2>🛠️ DevTools確認手順</h2>
-            <div class="info">
-                <strong>推奨確認手順：</strong><br>
-                1. F12キーでDevToolsを開く<br>
-                2. "Console"タブを選択<br>
-                3. "Network"タブも併せて確認<br>
-                4. 上記のテストボタンを実行<br>
-                5. コンソールやネットワークタブでエラー/警告メッセージを確認<br><br>
-
-                <strong>ポリシー有効時の期待動作：</strong><br>
-                • 即座にネットワークエラーが発生<br>
-                • DevTools警告が表示されない<br>
-                • ユーザープロンプトなし<br><br>
-
-                <strong>ポリシー無効時の期待動作：</strong><br>
-                • DevTools警告が表示される<br>
-                • 状況によっては要求が継続される<br>
-                • ブラウザによる追加のセキュリティチェック
-            </div>
+            <h3>🔍 ブラウザ情報</h3> <button class="test-button" onclick="showBrowserInfo()">ブラウザ情報表示</button>
+            <div id="browser-info"></div>
         </div>
     </div>
-
-    <script src="local-request-test.js"></script>
-    <script>
-        // ページ読み込み時の初期化
-        document.addEventListener('DOMContentLoaded', function () {
-            populateTargetList();
-            checkPolicyStatus();
-        });
-
-        // ターゲットリストの表示
-        function populateTargetList() {
-            const targetList = document.getElementById('targetList');
-            const targets = getTestTargets();
-
-            targetList.innerHTML = '';
-            targets.forEach(target => {
-                const item = document.createElement('div');
-                item.className = 'target-item';
-                item.innerHTML = `
-                    <strong>${target.url}</strong><br>
-                    <small>${target.description}</small>
-                `;
-                targetList.appendChild(item);
-            });
-        }
-
-        // ポリシー状態確認（簡易版）
-        function checkPolicyStatus() {
-            const statusDiv = document.getElementById('policyStatus');
-
-            // User-Agentからブラウザ情報を確認
-            const isEdge = navigator.userAgent.includes('Edg/');
-
-            if (!isEdge) {
-                statusDiv.textContent = 'ポリシー状態: Microsoft Edge以外';
-                statusDiv.className = 'policy-status policy-unknown';
-                return;
-            }
-
-            // 簡易的なテスト要求でポリシー状態を推測
-            testPolicyStatus()
-                .then(enabled => {
-                    if (enabled) {
-                        statusDiv.textContent = 'ポリシー状態: 有効 (推測)';
-                        statusDiv.className = 'policy-status policy-enabled';
-                    } else {
-                        statusDiv.textContent = 'ポリシー状態: 無効 (推測)';
-                        statusDiv.className = 'policy-status policy-disabled';
-                    }
-                })
-                .catch(() => {
-                    statusDiv.textContent = 'ポリシー状態: 不明';
-                    statusDiv.className = 'policy-status policy-unknown';
-                });
-        }
-    </script>
+    <script>        // Edge設定管理        function openEdgeFlags() {            window.open('edge://flags/#local-network-access-check', '_blank');        }        function showEdgeSettings() {            alert('Edge設定:\n1. edge://flags/#local-network-access-check を開く\n2. "Enabled" に設定\n3. Edgeを再起動');        }        // テスト関数（シンプル版）        async function testRouter() {            const result = await quickTestRouter();            logTestResult(result, 'ルーターアクセス');            displayResult('router-result', result);        }        async function testLocalhost() {            const result = await quickTestLocalhost();            logTestResult(result, 'ローカルホスト');            displayResult('localhost-result', result);        }        async function testPrivateNetwork() {            const result = await quickTestPrivateNetwork();            logTestResult(result, 'プライベートネットワーク');            displayResult('private-result', result);        }        function showBrowserInfo() {            const versionInfo = checkEdgeVersionSupport();            const resultDiv = document.getElementById('browser-info');                        resultDiv.innerHTML = `                <div class="result info">                    <strong>🌐 ブラウザ情報</strong><br>                    <strong>対応状況:</strong> ${versionInfo.supported ? '✅ 対応' : '❌ 非対応'}<br>                    <strong>詳細:</strong> ${versionInfo.message}<br>                    <strong>UserAgent:</strong> ${navigator.userAgent}                </div>            `;        }        function displayResult(elementId, result) {            const resultDiv = document.getElementById(elementId);            const statusClass = result.success ? 'success' : 'error';            const dialogInfo = result.dialogSuspected ? '<br><strong>💬 ダイアログ操作が行われた可能性があります</strong>' : '';                        resultDiv.innerHTML = `                <div class="result ${statusClass}">                    <strong>${result.success ? '✅ 成功' : '❌ ブロック/エラー'}</strong><br>                    ${result.message}${dialogInfo}                    <br><small>応答時間: ${result.responseTime}ms</small>                </div>            `;                        // 自動スクロール            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });        }        // ページ読み込み時の初期化        document.addEventListener('DOMContentLoaded', function() {            console.log('[EdgeTest] ページ読み込み完了');            showBrowserInfo();        });    </script>
+    <script src="edge-local-network-test.js"></script>
 </body>
 
 </html>

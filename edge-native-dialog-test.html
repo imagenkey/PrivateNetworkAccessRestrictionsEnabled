@@ -195,7 +195,8 @@
 
         <div class="test-section">
             <h2>📋 テスト概要</h2>
-            <p>このページは、Microsoft EdgeのLocalNetworkAccessRestrictionsEnabledポリシーによる<strong>ブラウザネイティブの許可ダイアログ</strong>をテストします。</p>
+            <p>このページは、Microsoft
+                EdgeのLocalNetworkAccessRestrictionsEnabledポリシーによる<strong>ブラウザネイティブの許可ダイアログ</strong>をテストします。</p>
             <p>ポリシーが有効な場合、ローカルネットワークアクセス時にMicrosoft Edge自体が許可ダイアログを表示します。</p>
         </div>
 
@@ -298,29 +299,29 @@
         <div class="test-section">
             <h2>🛠️ 期待される動作</h2>
             <div class="code-block">
-<strong>ポリシー有効時 (LocalNetworkAccessRestrictionsEnabled = true):</strong>
+                <strong>ポリシー有効時 (LocalNetworkAccessRestrictionsEnabled = true):</strong>
 
-1. 初回アクセス:
-   - ローカルネットワーク要求を検出
-   - Microsoft Edgeがネイティブ許可ダイアログを表示
-   - ユーザーの明示的な選択が必要
+                1. 初回アクセス:
+                - ローカルネットワーク要求を検出
+                - Microsoft Edgeがネイティブ許可ダイアログを表示
+                - ユーザーの明示的な選択が必要
 
-2. 許可後:
-   - 同じサイトからの同種要求は許可
-   - サイト設定に許可情報が保存
-   - 今後のアクセスは自動許可
+                2. 許可後:
+                - 同じサイトからの同種要求は許可
+                - サイト設定に許可情報が保存
+                - 今後のアクセスは自動許可
 
-3. ブロック後:
-   - 同じサイトからの要求は継続ブロック
-   - サイト設定でブロック状態が保持
-   - 手動でサイト設定を変更するまで継続
+                3. ブロック後:
+                - 同じサイトからの要求は継続ブロック
+                - サイト設定でブロック状態が保持
+                - 手動でサイト設定を変更するまで継続
 
-<strong>ポリシー無効時 (LocalNetworkAccessRestrictionsEnabled = false):</strong>
+                <strong>ポリシー無効時 (LocalNetworkAccessRestrictionsEnabled = false):</strong>
 
-1. 従来の動作:
-   - 警告のみ表示（DevToolsで確認可能）
-   - 要求は基本的に継続
-   - ユーザー許可は不要
+                1. 従来の動作:
+                - 警告のみ表示（DevToolsで確認可能）
+                - 要求は基本的に継続
+                - ユーザー許可は不要
             </div>
         </div>
 

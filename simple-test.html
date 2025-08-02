@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ローカルネットワークアクセステスト</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #0078d4;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-form {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0078d4;
+            outline: none;
+        }
+
+        .button-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #106ebe;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quick-buttons {
+            margin: 15px 0;
+        }
+
+        .quick-buttons button {
+            background: #6c757d;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .quick-buttons button:hover {
+            background: #5a6268;
+        }
+
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌐 ローカルネットワークアクセステスト</h1>
+
+        <div class="info-box">
+            <strong>📋 Microsoft Edge v138+ ローカルネットワークアクセス制御テスト</strong><br>
+            URLを入力して接続テストを行います。Edge v138以降では、ローカルネットワークアクセス時にダイアログが表示される場合があります。
+        </div>
+
+        <div class="test-form">
+            <label for="testUrl">テスト対象URL:</label>
+            <input type="text" id="testUrl" placeholder="例: http://127.0.0.1:8080" value="http://127.0.0.1:8080">
+
+            <div class="quick-buttons">
+                <strong>クイック設定:</strong><br>
+                <button onclick="setUrl('http://127.0.0.1:8080')">ローカルサーバー</button>
+                <button onclick="setUrl('http://192.168.1.1')">ルーター</button>
+                <button onclick="setUrl('http://10.0.0.1')">プライベートIP</button>
+                <button onclick="setUrl('http://localhost:3000')">開発サーバー</button>
+            </div>
+
+            <div class="button-group">
+                <button onclick="testConnection()" id="testButton">🚀 接続テスト実行</button>
+                <button onclick="clearResult()">🗑️ 結果クリア</button>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ 注意事項:</strong><br>
+            • Edge設定: <code>edge://flags/#local-network-access-check</code> を「Enabled」に設定<br>
+            • ダイアログが表示された場合は「許可」または「ブロック」を選択<br>
+            • 応答時間が1秒以上の場合、ダイアログ操作が行われた可能性があります
+        </div>
+
+        <div id="result" class="result info">
+            結果がここに表示されます...
+        </div>
+    </div>
+
+    <script>
+        function setUrl(url) {
+            document.getElementById('testUrl').value = url;
+        }
+
+        function clearResult() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result info';
+            resultDiv.textContent = '結果がここに表示されます...';
+        }
+
+        async function testConnection() {
+            const url = document.getElementById('testUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            const testButton = document.getElementById('testButton');
+
+            if (!url) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = 'エラー: URLを入力してください';
+                return;
+            }
+
+            // ボタンを無効化
+            testButton.disabled = true;
+            testButton.textContent = '⏳ テスト実行中...';
+
+            // 結果表示をクリア
+            resultDiv.className = 'result info';
+            resultDiv.textContent = `テスト開始: ${url}\n待機中...`;
+
+            const startTime = Date.now();
+
+            try {
+                // タイムアウト設定（10秒）
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                // 成功
+                resultDiv.className = 'result success';
+                const dialogSuspected = responseTime > 1000;
+                const dialogInfo = dialogSuspected ? '\n💬 ダイアログ操作が行われた可能性があります' : '';
+
+                resultDiv.textContent = `✅ 接続成功
+URL: ${url}
+応答時間: ${responseTime}ms
+レスポンスタイプ: ${response.type}${dialogInfo}
+
+📊 詳細情報:
+- Status: ${response.status || 'N/A (no-cors)'}
+- Type: ${response.type}
+- Redirected: ${response.redirected}
+- OK: ${response.ok}`;
+
+            } catch (error) {
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+
+                resultDiv.className = 'result error';
+
+                let errorMessage = '❌ 接続失敗\n';
+                let dialogInfo = '';
+
+                if (error.name === 'AbortError') {
+                    errorMessage += `エラー: タイムアウト (10秒)
+可能性: ダイアログが表示されている、またはサーバーが応答しない`;
+                    dialogInfo = '\n💬 ダイアログが表示されている可能性があります';
+                } else if (error.message.includes('Failed to fetch')) {
+                    if (responseTime < 50) {
+                        errorMessage += `エラー: 即座のブロック
+可能性: ポリシーまたはEdge設定によるブロック`;
+                    } else if (responseTime > 500) {
+                        errorMessage += `エラー: 遅延ブロック
+可能性: ユーザーがダイアログで「ブロック」を選択`;
+                        dialogInfo = '\n💬 ダイアログで「ブロック」が選択された可能性があります';
+                    } else {
+                        errorMessage += `エラー: ネットワークエラー
+可能性: サーバーが起動していない、またはアクセス不可`;
+                    }
+                } else {
+                    errorMessage += `エラー: ${error.message}`;
+                }
+
+                resultDiv.textContent = `${errorMessage}
+                
+URL: ${url}
+応答時間: ${responseTime}ms
+エラータイプ: ${error.name}${dialogInfo}
+
+🔧 対処方法:
+1. サーバーが起動していることを確認
+2. Edge設定を確認: edge://flags/#local-network-access-check
+3. ダイアログが表示された場合は適切に選択`;
+            }
+
+            // ボタンを再有効化
+            testButton.disabled = false;
+            testButton.textContent = '🚀 接続テスト実行';
+        }
+
+        // Enterキーでテスト実行
+        document.getElementById('testUrl').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                testConnection();
+            }
+        });
+
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('[ローカルネットワークテスト] ページ読み込み完了');
+
+            // ブラウザ情報をコンソールに出力
+            console.log('UserAgent:', navigator.userAgent);
+
+            // Edge バージョン確認
+            if (navigator.userAgent.includes('Edg/')) {
+                const edgeVersion = navigator.userAgent.match(/Edg\/(\d+)/);
+                if (edgeVersion) {
+                    const version = parseInt(edgeVersion[1]);
+                    console.log(`Microsoft Edge v${version} ${version >= 138 ? '(v138+対応)' : '(v138未満 - 非対応)'}`);
+                }
+            } else {
+                console.log('Microsoft Edge以外のブラウザです');
+            }
+        });
+    </script>
+</body>
+
+</html>
